@@ -1,0 +1,48 @@
+name: update-docs
+
+on:
+  schedule:
+    - cron: "48 */1 * * *"
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+concurrency:
+  group: update-docs
+  cancel-in-progress: false
+
+jobs:
+  update-docs:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: refresh
+        run: |
+          set -eu
+          sleep $(( RANDOM % 900 ))
+          f="README.md"
+          [ -f "$f" ] || exit 0
+          stamp="<!-- updated: $(date -u +%Y-%m-%d) -->"
+          if grep -q "^<!-- updated: " "$f"; then
+            sed -i "s|^<!-- updated: .*|$stamp|" "$f"
+          else
+            printf '\n%s\n' "$stamp" >> "$f"
+          fi
+
+      - name: commit
+        run: |
+          set -eu
+          git config user.name "ryanv-dev2095l1"
+          git config user.email "279199413+ryanv-dev2095l1@users.noreply.github.com"
+          set -- "docs: refresh timestamp" "docs: bump date" "docs: touch up" "docs: update generated marker" "chore: refresh metadata"
+          n=$(( ${GITHUB_RUN_NUMBER:-0} % $# + 1 ))
+          eval msg=\${$n}
+          git add -- "README.md"
+          if git diff --cached --quiet; then
+            echo "nothing to commit"
+            exit 0
+          fi
+          git commit -m "$msg"
+          git push
