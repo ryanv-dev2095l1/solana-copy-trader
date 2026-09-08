@@ -50,3 +50,5 @@ solana-copy-trader history --limit 20
 ## License
 
 MIT
+
+<!-- updated: 2026-09-08 -->
