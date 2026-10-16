@@ -51,4 +51,4 @@ solana-copy-trader history --limit 20
 
 MIT
 
-<!-- updated: 2026-10-15 -->
+<!-- updated: 2026-10-16 -->
